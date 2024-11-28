@@ -1,29 +1,39 @@
-# prompt: coding python encapsulasi private dan protect
+class AkunBank:
+    def __init__(self, nama, saldo):
+        self.nama = nama           # Public
+        self._jenis_akun = "Tabungan"  # Protected
+        self.__saldo = saldo       # Private
 
-class MyClass:
-    def __init__(self, public_attr, protected_attr, private_attr):
-        self.public_attr = public_attr
-        self._protected_attr = protected_attr  # Protected attribute (convention)
-        self.__private_attr = private_attr  # Private attribute (name mangling)
+    def cek_saldo(self):           # Method Public untuk akses private
+        return f"Saldo {self.nama}: Rp{self.__saldo}"
 
-    def get_private_attr(self):
-        return self.__private_attr
+    def tambah_saldo(self, jumlah):  # Method Public untuk memodifikasi saldo
+        if jumlah > 0:
+            self.__saldo += jumlah
+            return f"Saldo berhasil ditambahkan. {self.cek_saldo()}"
+        return "Jumlah harus lebih besar dari 0."
 
-    def set_private_attr(self, new_value):
-        self.__private_attr = new_value
+    def _ubah_jenis_akun(self, jenis):  # Method Protected
+        self._jenis_akun = jenis
+        return f"Jenis akun diubah menjadi: {self._jenis_akun}"
 
-# Example usage
-obj = MyClass("Public", "Protected", "Private")
 
-# Accessing attributes
-print(obj.public_attr)       # Accessing public attribute directly
-print(obj._protected_attr)   # Accessing protected attribute (convention, still accessible)
-# print(obj.__private_attr) # Direct access will cause an AttributeError
+# Kelas Turunan
+class AkunPremium(AkunBank):
+    def upgrade_akun(self):
+        return self._ubah_jenis_akun("Premium")  # Bisa akses protected
 
-# Accessing private attribute using methods
-print(obj.get_private_attr())
-obj.set_private_attr("New Private Value")
-print(obj.get_private_attr())
 
-# Name mangling demonstration (accessing the private attribute directly, but with modified name)
-obj._MyClass__private_attr
+# Contoh Penggunaan
+akun = AkunPremium("Alice", 500000)
+
+# Akses Public
+print(akun.cek_saldo())              # Output: Saldo Alice: Rp500000
+print(akun.tambah_saldo(200000))     # Output: Saldo berhasil ditambahkan. Saldo Alice: Rp700000
+
+# Akses Protected (dalam turunan)
+print(akun.upgrade_akun())           # Output: Jenis akun diubah menjadi: Premium
+
+# Akses langsung terhadap Private akan error
+# print(akun.__saldo)                # Error
+# print(akun._jenis_akun)            # Bisa, tapi tidak disarankan
